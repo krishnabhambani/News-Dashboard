@@ -8,10 +8,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const newsContainer = document.getElementById('news-container');
 
     async function fetchNews(country, category) {
-        const url = `${BASE_URL}?country=${country}&category=${category}&apiKey=${API_KEY}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        displayNews(data.articles);
+        try {
+            const url = `${BASE_URL}?country=${country}&category=${category}&apiKey=${API_KEY}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            if (data.status !== 'ok') {
+                throw new Error(`API Error: ${data.message}`);
+            }
+
+            displayNews(data.articles);
+        } catch (error) {
+            displayError(error.message);
+        }
     }
 
     function displayNews(articles) {
